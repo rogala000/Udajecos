@@ -1,0 +1,47 @@
+    import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutput;
+import java.io.ObjectOutputStream;
+import java.rmi.*;
+    import java.rmi.server.*;
+import java.util.List;
+     
+public class Addition extends UnicastRemoteObject implements AdditionInterface {
+	public static List ramka;
+
+	public Addition () throws RemoteException {   }
+     
+		public int add(int a, int b) throws RemoteException {
+			int result=a+b;
+			return result;
+		}
+		
+		
+		public void zapis_do_ramki(Packet packet) throws RemoteException{
+			Addition addition = new Addition();
+			byte[] dane = addition.serialize(packet);
+			ramka.add(packet);
+		}
+		
+		private byte[] serialize(Object obj) {
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			ObjectOutput out = null;
+			try {
+			  out = new ObjectOutputStream(bos);   
+				out.writeObject(obj);
+			  out.flush();
+			  return bos.toByteArray();
+			}
+			catch(IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+			finally {
+			  try {
+			    bos.close();
+			  } catch (IOException e) {
+				  e.printStackTrace();
+			  }
+		  }
+		}
+}
